@@ -1,4 +1,8 @@
-export function Duetable() {
+import { USDollar, DateConverter } from "@/lib/utils"
+
+export function Duetable( {bills}: {  
+    bills: {description: string, amount: number, due_date: string, is_paid: boolean}[]
+} ) {
     return (
         <table className="table-fixed w-full border-collapse">
             <thead className="border-b">
@@ -10,36 +14,14 @@ export function Duetable() {
                 </tr>
             </thead>
             <tbody>
-                <tr className="h-14">
-                    <td className="pl-4 font-semibold">Water</td>
-                    <td className="font-semibold">2021-10-01</td>
-                    <td><div className="py-1 px-2 bg-green-200 text-green-700 w-fit rounded">• Paid</div></td>
-                    <td className="font-semibold">$100.00</td>
-                </tr>
-                <tr className="h-14 border-t">
-                    <td className="pl-4 font-semibold">University</td>
-                    <td className="font-semibold">2021-10-01</td>
-                    <td><div className="py-1 px-2 bg-orange-200 text-orange-500 w-fit rounded">• Pending</div></td>
-                    <td className="font-semibold">$400.00</td>
-                </tr>
-                <tr className="h-14 border-t">
-                    <td className="pl-4 font-semibold">University</td>
-                    <td className="font-semibold">2021-10-01</td>
-                    <td><div className="py-1 px-2 bg-orange-200 text-orange-500 w-fit rounded">• Pending</div></td>
-                    <td className="font-semibold">$400.00</td>
-                </tr>
-                <tr className="h-14 border-t">
-                    <td className="pl-4 font-semibold">University</td>
-                    <td className="font-semibold">2021-10-01</td>
-                    <td><div className="py-1 px-2 bg-orange-200 text-orange-500 w-fit rounded">• Pending</div></td>
-                    <td className="font-semibold">$400.00</td>
-                </tr>
-                <tr className="h-14 border-t">
-                    <td className="pl-4 font-semibold">University</td>
-                    <td className="font-semibold">2021-10-01</td>
-                    <td><div className="py-1 px-2 bg-orange-200 text-orange-500 w-fit rounded">• Pending</div></td>
-                    <td className="font-semibold">$400.00</td>
-                </tr>
+                {bills.map((bill, index) => (
+                    <tr key={index} className="h-14 border-b">
+                        <td className="pl-4 font-semibold">{bill.description}</td>
+                        <td className="font-semibold">{DateConverter(bill.due_date)}</td>
+                        {bill.is_paid ? <td><div className="py-1 px-2 bg-red-200 text-red-700 w-fit rounded">• Due</div></td> : <td><div className="py-1 px-2 bg-green-200 text-green-700 w-fit rounded">• Paid</div></td>}
+                        <td className="font-semibold">{USDollar(bill.amount)}</td>
+                    </tr>
+                ))}
             </tbody>
         </table>
     )
