@@ -18,7 +18,7 @@ export default function Layout({
   return (
     <body>
         
-        <header className="bg-white rounded-md h-20 flex items-center justify-center px-5 mb-4 shadow-sm">
+        <header className="bg-white rounded-md py-3 flex items-center justify-center px-5 mb-4 shadow-sm">
             
             <div className="w-1/5">
                 <Link href="/dashboard" className="flex gap-3 w-fit">

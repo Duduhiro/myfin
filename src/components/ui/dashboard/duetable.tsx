@@ -14,14 +14,14 @@ export function Duetable( {bills}: {
                 </tr>
             </thead>
             <tbody>
-                {bills.map((bill, index) => (
-                    <tr key={index} className="h-14 border-b">
-                        <td className="pl-4 font-semibold">{bill.description}</td>
+                {bills.length != 0 ? bills.map((bill, index) => (
+                    <tr key={index} className="border-b">
+                        <td className="pl-4 py-2 font-semibold">{bill.description}</td>
                         <td className="font-semibold">{DateConverter(bill.due_date)}</td>
-                        {bill.is_paid ? <td><div className="py-1 px-2 bg-red-200 text-red-700 w-fit rounded">• Due</div></td> : <td><div className="py-1 px-2 bg-green-200 text-green-700 w-fit rounded">• Paid</div></td>}
+                        {bill.is_paid ? <td><div className="py-1 px-2 bg-green-200 text-green-700 w-fit rounded text-sm">• Paid</div></td> : <td><div className="py-1 px-2 bg-red-200 text-red-700 w-fit rounded text-sm">• Due</div></td>}
                         <td className="font-semibold">{USDollar(bill.amount)}</td>
                     </tr>
-                ))}
+                )) : <tr><td colSpan={4} className="py-4 text-lg text-center">No bills available</td></tr>}
             </tbody>
         </table>
     )

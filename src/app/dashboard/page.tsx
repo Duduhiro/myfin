@@ -2,28 +2,23 @@ import { PieChartComponent } from "@/components/ui/piechart"
 import { BarChartComponent } from "@/components/ui/barchart";
 import { CashFlowChartComponent } from "@/components/ui/cashflowchart";
 import { ExpedingLimitChartComponent } from "@/components/ui/expendinglimit";
-import { fetchUsers } from "@/lib/data";
-import { User } from "@/lib/types/user";
 import BalanceComp from "@/components/ui/dashboard/balance";
 import SavingsComp from "@/components/ui/dashboard/savings";
 import MonthExpense from "@/components/ui/dashboard/monthExpense";
 import MonthIncome from "@/components/ui/dashboard/monthIncome";
 import Billings from "@/components/ui/dashboard/billings";
 
-
-export default async function Page({
+export default function Page({
     searchParams,
 }: {
     searchParams?: {
-        query?: string;
-        page?: string;
+        billings?: string;
+        filter?: string;
     }
 }) {
     
-    const query = searchParams?.query || '';
-    const currentPage = Number(searchParams?.page) || 1;
-
-    const users: User[] = await fetchUsers();
+    const query = searchParams?.billings || '';
+    const filter = searchParams?.filter || '';
     
     const dashboardData = {
         balance: 1000,
@@ -67,7 +62,7 @@ export default async function Page({
                         <ExpedingLimitChartComponent />
                     </div>
                 </div>
-                <Billings query={query} />
+                <Billings query={query} filter={filter} />
             </div>
         </div>
     )
