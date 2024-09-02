@@ -14,6 +14,7 @@ export default function SearchBillings() {
         console.log(`Billings Search... ${term}`)
 
         const params = new URLSearchParams(searchParams);
+        params.set('page', '1');
         if (term) {
             params.set('billings', term);
         } else {

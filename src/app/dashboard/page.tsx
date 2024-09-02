@@ -7,25 +7,24 @@ import SavingsComp from "@/components/ui/dashboard/savings";
 import MonthExpense from "@/components/ui/dashboard/monthExpense";
 import MonthIncome from "@/components/ui/dashboard/monthIncome";
 import Billings from "@/components/ui/dashboard/billings";
+import { FinancialData } from "@/lib/types/dashboard";
+import { fetchDashboard } from "@/lib/data";
 
-export default function Page({
+export default async function Page({
     searchParams,
 }: {
     searchParams?: {
         billings?: string;
         filter?: string;
+        page?: number;
     }
 }) {
     
     const query = searchParams?.billings || '';
     const filter = searchParams?.filter || '';
-    
-    const dashboardData = {
-        balance: 1000,
-        income: 400,
-        expense: 500,
-        savings: -100 
-    }
+    const page = searchParams?.page || 1;
+
+    const dashboardData: FinancialData = await fetchDashboard();
 
     return (
         <div className="h-full bg-white rounded-md shadow-md p-5 flex gap-4">
@@ -36,8 +35,8 @@ export default function Page({
                 </div>
 
                 <div className="w-full h-1/6 flex gap-4">
-                    <MonthIncome income={dashboardData.income}/>
-                    <MonthExpense expense={dashboardData.expense}/>
+                    <MonthIncome income={dashboardData.income_value}/>
+                    <MonthExpense expense={dashboardData.expense_value}/>
                 </div>
 
                 <div className="flex h-4/6 gap-4 w-full">
@@ -62,7 +61,7 @@ export default function Page({
                         <ExpedingLimitChartComponent />
                     </div>
                 </div>
-                <Billings query={query} filter={filter} />
+                <Billings query={query} filter={filter} page={page} />
             </div>
         </div>
     )
