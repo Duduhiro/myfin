@@ -13,3 +13,9 @@ export interface Bills {
 }
 
 export interface FetchBillsResult {bills: Bills[], count: number};
+
+export interface DataPoint {
+    month: string
+    income: number
+    expense: number
+}

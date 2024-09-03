@@ -1,7 +1,8 @@
 'use server'
 
+import exp from "constants";
 import { openDb } from "./db";
-import { FetchBillsResult, FinancialData } from "./types/dashboard";
+import { FetchBillsResult, FinancialData, DataPoint } from "./types/dashboard";
 
 export async function fetchUsers() {
     
@@ -81,19 +82,166 @@ export async function fetchDashboard() {
     }
 }
 
-export async function fetchIncomeXExpense() {
+export async function fetchIncomeXExpense(): Promise<DataPoint[]> {
     const db = await openDb();
 
     const date = new Date();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
 
+    let strmonth = '';
+
+    if (month < 10) {
+        strmonth = `0${month}`;
+    } else {
+        strmonth = `${month}`;
+    }
+
+    const querydate_limit = `${year}-${strmonth}-01`;
+
     if (month < 6) {
         month += 12;
         year -= 1;
     }
 
-    month -= 5;
+    month -= 6;
+
+    if (month < 10) {
+        strmonth = `0${month}`;
+    } else {
+        strmonth = `${month}`;
+    }
+
+    const querydate = `${year}-${strmonth}-01`;
+
+    interface IncomeExpenseData {
+        [key: number]: {income?: number, expenses?: number};
+    }
+
+    try {
+
+        const incomeExpenseData: IncomeExpenseData = {};
+
+        for (let i = 0; i < 6; i++) {
+            incomeExpenseData[month] = {income: 0, expenses: 0};
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            }
+        }
+
+        const income = await db.all(`SELECT date, amount FROM income WHERE date >= '${querydate}' AND date < '${querydate_limit}' ORDER BY date ASC`);
+        const expenses = await db.all(`SELECT date, amount FROM expenses WHERE date >= '${querydate}' AND date < '${querydate_limit}' ORDER BY date ASC`);
+
+        income.forEach((item) => {
+            const date = item.date.split('-')[1];
+            incomeExpenseData[Number(date)].income += item.amount;
+        })
+
+        expenses.forEach((item) => {
+            const date = item.date.split('-')[1];
+            incomeExpenseData[Number(date)].expenses += item.amount;
+        })
+
+        const chartData: DataPoint[] = [];
+        const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        for (let key in incomeExpenseData) {
+            chartData.push({
+                month: months[key], 
+                income: incomeExpenseData[key].income || 0, 
+                expense: incomeExpenseData[key].expenses || 0
+            });
+        }
+
+        return chartData;
+
+    } catch (err) {
+        console.error('Database Error:', err);
+        return [];
+    }
+
+}
+
+export async function fetchLastMonthExpenses() {
+    const db = await openDb();
+
+    const date = new Date();
+    let last_month = date.getMonth();
+    let this_month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    let last_strmonth = '';
+
+    if (last_month < 10) {
+        last_strmonth = `0${last_month}`;
+    } else {
+        last_strmonth = `${last_month}`;
+    }
+
+    let strmonth = '';
+
+    if (this_month < 10) {
+        strmonth = `0${this_month}`;
+    } else {
+        strmonth = `${this_month}`;
+    }
+
+    const querydate_last = `${year}-${last_strmonth}-01`;
+    const querydate = `${year}-${strmonth}-01`;
+
+    const colors = ['#fb7185', '#fb923c', '#bef264', '#2dd4bf', '#60a5fa',]
+
+    try {
+        const expenses = await db.all(`SELECT SUM(amount) AS amount, 
+        categories.name AS category 
+        FROM expenses 
+        JOIN categories 
+        ON expenses.category_id = categories.category_id
+        WHERE date >= '${querydate_last}'
+        AND date < '${querydate}'
+        GROUP BY expenses.category_id 
+        ORDER BY SUM(amount) DESC;
+        `);
+
+        const chartData = expenses.map((item, index) => {
+            return {
+                category: item.category,
+                amount: item.amount,
+                fill: colors[index]
+            }
+        });
+
+        return chartData;
+    } catch (err) {
+        console.error('Database Error:', err);
+        return [];
+    }
+}
+
+export async function fetchSpendingLimits() {
+    const db = await openDb();
+
+    const date = new Date();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    try {
+        const spendingLimits = await db.all(`SELECT limit_amount FROM spending_limits WHERE month = ${month} AND year = ${year}`);
+        return spendingLimits;
+    } catch (err) {
+        console.error('Database Error:', err);
+        return [];
+    }
+}
+
+export async function fetchThisMonthExpenses() {
+    const db = await openDb();
+
+    const date = new Date();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
 
     let strmonth = '';
 
@@ -105,47 +253,20 @@ export async function fetchIncomeXExpense() {
 
     const querydate = `${year}-${strmonth}-01`;
 
-    interface IncomeExpenseData {
-        [key: string]: {income?: number, expenses?: number};
-    }
+    const thisMonthExpense = {'total': 0, 'expense': 'expense', 'fill': '#9333ea'};
 
     try {
-        console.log(querydate)
+        const expenses = await db.all(`SELECT SUM(amount) FROM expenses WHERE date >= '${querydate}'`);
 
-        const incomeExpenseData: IncomeExpenseData = {};
+        if (expenses.length == 0 || expenses[0]['SUM(amount)'] == null) {
+            return [thisMonthExpense];
+        }
 
-        for 
+        thisMonthExpense['total'] = expenses[0]['SUM(amount)'];
 
-        const income = await db.all(`SELECT date, amount FROM income WHERE date >= '${querydate}' ORDER BY date ASC`);
-        const expenses = await db.all(`SELECT date, amount FROM expenses WHERE date >= '${querydate}' ORDER BY date ASC`);
-
-        console.log(income)
-        console.log(expenses)
-
-        income.forEach((item) => {
-            const date = item.date.split('-')[1];
-            if (!incomeExpenseData[date]) {
-                incomeExpenseData[date] = {};
-            }
-            incomeExpenseData[date].income = item.amount;
-        })
-
-        expenses.forEach((item) => {
-            const date = item.date.split('-')[1];
-            if (!incomeExpenseData[date]) {
-                incomeExpenseData[date] = {};
-            }
-            incomeExpenseData[date].expenses = item.amount;
-        })
-
-        console.log(incomeExpenseData)
-
-        return incomeExpenseData;
-
+        return [thisMonthExpense];
     } catch (err) {
         console.error('Database Error:', err);
-        return {income: [], expenses: []};
+        return [];
     }
-
-    
 }

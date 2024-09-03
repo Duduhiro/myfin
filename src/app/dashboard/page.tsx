@@ -7,8 +7,8 @@ import SavingsComp from "@/components/ui/dashboard/savings";
 import MonthExpense from "@/components/ui/dashboard/monthExpense";
 import MonthIncome from "@/components/ui/dashboard/monthIncome";
 import Billings from "@/components/ui/dashboard/billings";
-import { FinancialData } from "@/lib/types/dashboard";
-import { fetchDashboard, fetchIncomeXExpense } from "@/lib/data";
+import { FinancialData, DataPoint } from "@/lib/types/dashboard";
+import { fetchDashboard, fetchIncomeXExpense, fetchLastMonthExpenses, fetchSpendingLimits, fetchThisMonthExpenses } from "@/lib/data";
 
 export default async function Page({
     searchParams,
@@ -25,7 +25,10 @@ export default async function Page({
     const page = searchParams?.page || 1;
 
     const dashboardData: FinancialData = await fetchDashboard();
-    const incomeXExpense = await fetchIncomeXExpense();
+    const incomeXExpense: DataPoint[] = await fetchIncomeXExpense();
+    const lastMonthExpense = await fetchLastMonthExpenses();
+    const spendingLimit = await fetchSpendingLimits();
+    const thisMonthExpense = await fetchThisMonthExpenses();
 
     return (
         <div className="h-full bg-white rounded-md shadow-md p-5 flex gap-4">
@@ -42,11 +45,11 @@ export default async function Page({
 
                 <div className="flex h-4/6 gap-4 w-full">
                     <div className="w-1/2 h-full">
-                        <PieChartComponent />
+                        <PieChartComponent data={lastMonthExpense} />
                     </div>
                     
                     <div className="w-1/2 h-full">
-                        <BarChartComponent /* incomeXExpense={incomeXExpense} */ />
+                        <BarChartComponent data={incomeXExpense} />
                     </div>
                 </div>
 
@@ -59,7 +62,7 @@ export default async function Page({
                         <CashFlowChartComponent />
                     </div>
                     <div className="w-1/2 h-full">
-                        <ExpedingLimitChartComponent />
+                        <ExpedingLimitChartComponent limit={spendingLimit} expent={thisMonthExpense}/>
                     </div>
                 </div>
                 <Billings query={query} filter={filter} page={page} />

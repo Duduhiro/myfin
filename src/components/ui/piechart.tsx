@@ -18,43 +18,49 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import exp from "constants"
 
 const chartData = [
   { expense: "Transport", value: 275, fill: "#fdba74" },
   { expense: "Food", value: 200, fill: "#86efac" },
   { expense: "Entertainment", value: 100, fill: "#93c5fd" },
+  { expense: "Movie", value: 120, fill: "#23f3ad" },
+  { expense: "Rentals", value: 50, fill: "#4225dd" },
 ]
 
 const chartConfig = {
-  visitors: {
-    label: "Expent",
-  },
-  transport: {
-    label: "Transport",
-    color: "hsl(var(--chart-1))",
-  },
-  food: {
-    label: "Food",
-    color: "hsl(var(--chart-2))",
-  },
-  
+    visitors: {
+        label: "Expent",
+    },
+    transport: {
+        label: "Transport",
+        color: "hsl(var(--chart-1))",
+    },
+    food: {
+        label: "Food",
+        color: "hsl(var(--chart-2))",
+    },
     entertainment: {
         label: "Entertainment",
         color: "hsl(var(--chart-3))",
     }
 } satisfies ChartConfig
 
-export function PieChartComponent() {
+export function PieChartComponent({ data }: { data: { category: string, amount: number, fill:string }[]}) {
   const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.value, 0)
-  }, [])
+    return data.reduce((acc, curr) => acc + curr.amount, 0)
+  }, [data])
+
+    const date = new Date();
+    const month = date.getMonth() - 1;
+    const year = date.getFullYear();
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Expenses</CardTitle>
-        <CardDescription>June 2024</CardDescription>
+        <CardDescription>{months[month]} {year}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -67,9 +73,9 @@ export function PieChartComponent() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="expense"
+              data={data}
+              dataKey="amount"
+              nameKey="category"
               innerRadius={60}
               strokeWidth={5}
             >

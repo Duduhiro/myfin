@@ -33,12 +33,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ExpedingLimitChartComponent() {
+export function ExpedingLimitChartComponent({ limit, expent }: { limit: {limit_amount: number}[], expent: { expense: string, total: number, fill: string}[]}) {
+  
+    const date = new Date();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+    
+    const degrees = 360 / (limit[0].limit_amount / expent[0].total);
+
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Monthly Expending Limit</CardTitle>
-        <CardDescription>June 2024</CardDescription>
+        <CardDescription>{months[month]} {year}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -46,8 +54,8 @@ export function ExpedingLimitChartComponent() {
           className="mx-auto"
         >
           <RadialBarChart
-            data={chartData}
-            endAngle={230}
+            data={expent}
+            endAngle={degrees}
             innerRadius={80}
             outerRadius={140}
           >
@@ -75,7 +83,7 @@ export function ExpedingLimitChartComponent() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          ${chartData[0].total.toLocaleString()}
+                          ${expent[0].total.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -95,7 +103,7 @@ export function ExpedingLimitChartComponent() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground text-md">
-          This month limit: $2000
+          This month&apos;s limit: ${limit[0].limit_amount}
         </div>
       </CardFooter>
     </Card>
