@@ -24,23 +24,25 @@ export async function fetchBills(query: string, sortedBy: string = 'date_recent'
 
     const offset = (page - 1) * 5;
 
-    let dbQuery = `SELECT * FROM bills WHERE due_date >= '${todayStr}' AND description LIKE '%${query}%' `;
+    let dbQuery = `FROM bills WHERE due_date >= '${todayStr}' AND description LIKE '%${query}%' `;
+
+    let dbQuery_sorted = '';
 
     if (sortedBy == 'date_recent' || sortedBy == '') {
-        dbQuery += "ORDER BY due_date ASC";
+        dbQuery_sorted = "ORDER BY due_date ASC";
     } else if (sortedBy == 'date_old') {
-        dbQuery += "ORDER BY due_date DESC";
+        dbQuery_sorted = "ORDER BY due_date DESC";
     } else if (sortedBy == 'paid') {
-        dbQuery += "AND is_paid == 1";
+        dbQuery_sorted = "AND is_paid == 1";
     } else if (sortedBy == 'due') {
-        dbQuery += "AND is_paid == 0";
+        dbQuery_sorted = "AND is_paid == 0";
     }
 
-    dbQuery += ` LIMIT 5 OFFSET ${offset}`;
+    dbQuery += ` ${dbQuery_sorted} LIMIT 5 OFFSET ${offset}`;
 
     try {
-        const bills = await db.all(dbQuery);
-        const billsCount = await db.get(`SELECT COUNT(*) FROM bills WHERE due_date >= '${todayStr}' AND description LIKE '%${query}%'`);  
+        const bills = await db.all('SELECT * ' + dbQuery);
+        const billsCount = await db.get(`SELECT COUNT(*) FROM bills where due_date >= '${todayStr}' AND description LIKE '%${query}%' ` + dbQuery_sorted);
         return {bills, count: billsCount['COUNT(*)']};
     } catch (err) {
         console.error('Database Error:', err);
@@ -77,4 +79,73 @@ export async function fetchDashboard() {
         console.error('Database Error:', err);
         return dashboardData;
     }
+}
+
+export async function fetchIncomeXExpense() {
+    const db = await openDb();
+
+    const date = new Date();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    if (month < 6) {
+        month += 12;
+        year -= 1;
+    }
+
+    month -= 5;
+
+    let strmonth = '';
+
+    if (month < 10) {
+        strmonth = `0${month}`;
+    } else {
+        strmonth = `${month}`;
+    }
+
+    const querydate = `${year}-${strmonth}-01`;
+
+    interface IncomeExpenseData {
+        [key: string]: {income?: number, expenses?: number};
+    }
+
+    try {
+        console.log(querydate)
+
+        const incomeExpenseData: IncomeExpenseData = {};
+
+        for 
+
+        const income = await db.all(`SELECT date, amount FROM income WHERE date >= '${querydate}' ORDER BY date ASC`);
+        const expenses = await db.all(`SELECT date, amount FROM expenses WHERE date >= '${querydate}' ORDER BY date ASC`);
+
+        console.log(income)
+        console.log(expenses)
+
+        income.forEach((item) => {
+            const date = item.date.split('-')[1];
+            if (!incomeExpenseData[date]) {
+                incomeExpenseData[date] = {};
+            }
+            incomeExpenseData[date].income = item.amount;
+        })
+
+        expenses.forEach((item) => {
+            const date = item.date.split('-')[1];
+            if (!incomeExpenseData[date]) {
+                incomeExpenseData[date] = {};
+            }
+            incomeExpenseData[date].expenses = item.amount;
+        })
+
+        console.log(incomeExpenseData)
+
+        return incomeExpenseData;
+
+    } catch (err) {
+        console.error('Database Error:', err);
+        return {income: [], expenses: []};
+    }
+
+    
 }

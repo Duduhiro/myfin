@@ -29,8 +29,8 @@ export default function FilterList() {
 
         console.log(`Billings Filter... ${term}`)
         setHidden(true);
-
         const params = new URLSearchParams(searchParams);
+        params.set('page', '1');
         if (term) {
             params.set('filter', term);
         } else {

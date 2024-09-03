@@ -1,6 +1,5 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import {
@@ -38,6 +37,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function BarChartComponent() {
+
   return (
     <Card className="h-full">
       <CardHeader>

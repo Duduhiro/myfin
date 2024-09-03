@@ -8,7 +8,7 @@ import MonthExpense from "@/components/ui/dashboard/monthExpense";
 import MonthIncome from "@/components/ui/dashboard/monthIncome";
 import Billings from "@/components/ui/dashboard/billings";
 import { FinancialData } from "@/lib/types/dashboard";
-import { fetchDashboard } from "@/lib/data";
+import { fetchDashboard, fetchIncomeXExpense } from "@/lib/data";
 
 export default async function Page({
     searchParams,
@@ -25,6 +25,7 @@ export default async function Page({
     const page = searchParams?.page || 1;
 
     const dashboardData: FinancialData = await fetchDashboard();
+    const incomeXExpense = await fetchIncomeXExpense();
 
     return (
         <div className="h-full bg-white rounded-md shadow-md p-5 flex gap-4">
@@ -45,7 +46,7 @@ export default async function Page({
                     </div>
                     
                     <div className="w-1/2 h-full">
-                        <BarChartComponent />
+                        <BarChartComponent /* incomeXExpense={incomeXExpense} */ />
                     </div>
                 </div>
 
