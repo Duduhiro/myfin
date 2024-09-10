@@ -2,7 +2,7 @@ import { USDollar } from "@/lib/utils"
 
 export default function MonthExpense({ expense }: { expense: number }) {
     return (
-        <div className="w-1/2 shrink rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col">
+        <div className="w-1/2 shrink rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col bg-white">
             <div className="flex gap-4 items-center">
                 <h1 className="text-2xl font-semibold leading-none tracking-tight">Monthly Expense</h1>
                 

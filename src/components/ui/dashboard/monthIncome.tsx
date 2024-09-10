@@ -2,7 +2,7 @@ import { USDollar } from "@/lib/utils"
 
 export default function MonthIncome({ income }: { income:number }) {
     return (
-        <div className="w-1/2 rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col">
+        <div className="w-1/2 rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col bg-white">
             <div className="flex gap-4 items-center">
                 <h1 className="text-2xl font-semibold leading-none tracking-tight">Monthly Income</h1>
                 
