@@ -9,7 +9,7 @@ export default function LoginForm() {
                     <label className="-mb-4">Password</label>
                     <input placeholder="Enter your Password" className="border border-gray-400 py-3 pl-3 rounded shadow-sm" />
                     <button className="w-full mt-4 bg-green-400 py-3 text-lg font-semibold rounded ">Login</button>
-                    <div className="w-full border-t border-gray-300 pt-3 text-center text-sm">Don't have an account? Register</div>
+                    <div className="w-full border-t border-gray-300 pt-3 text-center text-sm">Don&apos;t have an account? Register</div>
                 </div>
             </form>
         </div>

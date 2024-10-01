@@ -39,8 +39,14 @@ export function ExpedingLimitChartComponent({ limit, expent }: { limit: {limit_a
     const month = date.getMonth();
     const year = date.getFullYear();
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-    
-    const degrees = 360 / (limit[0].limit_amount / expent[0].total);
+
+    let degrees = 0
+
+    if (limit[0].limit_amount == 0) {
+        degrees = 0;
+    } else {
+        degrees = 360 / limit[0].limit_amount;
+    }
 
   return (
     <Card className="flex flex-col h-full">

@@ -215,8 +215,10 @@ export async function fetchLastMonthExpenses() {
 
         return chartData;
     } catch (err) {
+
         console.error('Database Error:', err);
         return [];
+
     }
 }
 
@@ -228,7 +230,13 @@ export async function fetchSpendingLimits() {
     let year = date.getFullYear();
 
     try {
-        const spendingLimits = await db.all(`SELECT limit_amount FROM spending_limits WHERE month = ${month} AND year = ${year}`);
+
+        const spendingLimits = await db.all(`SELECT limit_amount FROM spending_limits WHERE month = ${month - 1} AND year = ${year}`);
+
+        if (spendingLimits.length == 0) {
+            spendingLimits.push({'limit_amount': 0})
+        }
+
         return spendingLimits;
     } catch (err) {
         console.error('Database Error:', err);

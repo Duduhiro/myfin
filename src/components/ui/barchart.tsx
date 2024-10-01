@@ -31,7 +31,6 @@ const chartConfig = {
 
 export function BarChartComponent({ data }: { data: DataPoint[] }) {
 
-    console.log(data)
     const title = `${data[0].month} - ${data[data.length - 1].month}`
 
   return (
